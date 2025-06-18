@@ -17,11 +17,6 @@ the cluster, its nodes and their shards.
     have been added, removed or modified between versions. Instead, use a
     defined list of the columns that you need to return from the query.
 
-.. rubric:: Table of contents
-
-.. contents::
-   :local:
-
 .. _sys-cluster:
 
 Cluster
@@ -956,7 +951,11 @@ Table schema
       - Shows the oldest Lucene segment version used in this shard.
       - ``TEXT``
     * - ``num_docs``
-      - The total amount of documents within a shard.
+      - The total number of documents within a shard. Documents inserted after
+        the shard becomes ``idle`` are not included. A ``refresh`` is required
+        to ensure they are counted. See
+        :ref:`refresh interval <sql-create-table-refresh-interval>` for more
+        details about idle tables.
       - ``BIGINT``
     * - ``oprhan_partition``
       - True if this shard belongs to an orphaned partition which doesn't belong to any table anymore.
@@ -1199,7 +1198,11 @@ of shards.
       - Generation number of the segment, increments for each segment written.
       - ``LONG``
     * - ``num_docs``
-      - Number of non-deleted Lucene documents in this segment.
+      - Number of non-deleted Lucene documents in this segment. Documents
+        inserted after the shard becomes ``idle`` are not included. A 
+        ``refresh`` is required to ensure they are counted. See
+        :ref:`refresh interval <sql-create-table-refresh-interval>` for more
+        details about idle tables.
       - ``INTEGER``
     * - ``deleted_docs``
       - Number of deleted Lucene documents in this segment.
