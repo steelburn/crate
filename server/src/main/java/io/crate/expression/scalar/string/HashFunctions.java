@@ -22,10 +22,9 @@
 package io.crate.expression.scalar.string;
 
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
+import org.apache.commons.codec.digest.Blake3;
 import org.elasticsearch.common.hash.MessageDigests;
 
 import io.crate.common.Hex;
@@ -41,6 +40,7 @@ public final class HashFunctions {
     public static void register(Functions.Builder builder) {
         register(builder, "md5", HashMethod.MD5::digest);
         register(builder, "sha1", HashMethod.SHA1::digest);
+        register(builder, "blake3", HashMethod.BLAKE3::digest);
     }
 
     private static void register(Functions.Builder builder, String name, UnaryOperator<String> func) {
@@ -56,24 +56,23 @@ public final class HashFunctions {
     }
 
     private enum HashMethod {
-        MD5(MessageDigests::md5),
-        SHA1(MessageDigests::sha1);
+        MD5(bytes -> MessageDigests.md5().digest(bytes)),
+        SHA1(bytes -> MessageDigests.sha1().digest(bytes)),
+        BLAKE3(bytes -> {
+            Blake3 digest = Blake3.initHash();
+            digest.update(bytes);
+            // Blake3 defaults to 32 byte (256-bit) output
+            return digest.doFinalize(32);
+        });
 
-        /**
-         * Do not pass the MessageDigest in directly but resolve it during
-         * runtime to avoid concurrency issue when the hash function is
-         * used by multiple threads at the same time.
-         */
-        private final Supplier<MessageDigest> messageDigestSupplier;
+        private final UnaryOperator<byte[]> byteHasher;
 
-        HashMethod(Supplier<MessageDigest> digestSupplier) {
-            this.messageDigestSupplier = digestSupplier;
+        HashMethod(UnaryOperator<byte[]> byteHasher) {
+            this.byteHasher = byteHasher;
         }
 
         public String digest(String input) {
-            MessageDigest messageDigest = messageDigestSupplier.get();
-            byte[] result = messageDigest.digest(input.getBytes(StandardCharsets.UTF_8));
-            return Hex.encodeHexString(result);
+            return Hex.encodeHexString(byteHasher.apply(input.getBytes(StandardCharsets.UTF_8)));
         }
     }
 }

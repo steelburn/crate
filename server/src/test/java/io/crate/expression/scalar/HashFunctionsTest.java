@@ -39,6 +39,9 @@ public class HashFunctionsTest extends ScalarTestCase {
         assertEvaluate("sha1('©rate')", "9a437faeb9adff59cc06313bfb23fe1d46181924");
         assertEvaluate("sha1('crate')", "1673dc397042322a0a5ac49c79cc08d3a25cb0f6");
         assertEvaluate("sha1('')", "da39a3ee5e6b4b0d3255bfef95601890afd80709");
+        assertEvaluate("blake3('©rate')", "7e60e9aec3049dd63fc695ea89fc20ae8abe5ea32388a5a60cf08d97b9e25ff4");
+        assertEvaluate("blake3('crate')", "012efcab3db1a63a5d50510e48f1fbf3ac26dbd28a3cec099457eff5fefa96aa");
+        assertEvaluate("blake3('')", "af1349b9f5f9a1a6a0404dea36dcc9499bcb25c9adc112b7cc9a93cae41f3262");
     }
 
     @Test
@@ -49,6 +52,9 @@ public class HashFunctionsTest extends ScalarTestCase {
         assertNormalize("sha1('©rate')", isLiteral("9a437faeb9adff59cc06313bfb23fe1d46181924"));
         assertNormalize("sha1('crate')", isLiteral("1673dc397042322a0a5ac49c79cc08d3a25cb0f6"));
         assertNormalize("sha1('')", isLiteral("da39a3ee5e6b4b0d3255bfef95601890afd80709"));
+        assertNormalize("blake3('©rate')", isLiteral("7e60e9aec3049dd63fc695ea89fc20ae8abe5ea32388a5a60cf08d97b9e25ff4"));
+        assertNormalize("blake3('crate')", isLiteral("012efcab3db1a63a5d50510e48f1fbf3ac26dbd28a3cec099457eff5fefa96aa"));
+        assertNormalize("blake3('')", isLiteral("af1349b9f5f9a1a6a0404dea36dcc9499bcb25c9adc112b7cc9a93cae41f3262"));
     }
 
     @Test
@@ -57,6 +63,8 @@ public class HashFunctionsTest extends ScalarTestCase {
         assertEvaluateNull("md5(null)", Literal.of(DataTypes.STRING, null));
         assertEvaluateNull("sha1(null)");
         assertEvaluateNull("sha1(name)", Literal.of(DataTypes.STRING, null));
+        assertEvaluateNull("blake3(null)");
+        assertEvaluateNull("blake3(name)", Literal.of(DataTypes.STRING, null));
     }
 
     @Test
@@ -65,6 +73,8 @@ public class HashFunctionsTest extends ScalarTestCase {
         assertEvaluate("md5(name)", "dd4827af87b26de9ed92e6fb08efc5ab", Literal.of("crate"));
         assertNormalize("sha1(name)", isFunction("sha1"));
         assertEvaluate("sha1(name)", "1673dc397042322a0a5ac49c79cc08d3a25cb0f6", Literal.of("crate"));
+        assertNormalize("blake3(name)", isFunction("blake3"));
+        assertEvaluate("blake3(name)", "012efcab3db1a63a5d50510e48f1fbf3ac26dbd28a3cec099457eff5fefa96aa", Literal.of("crate"));
     }
 
     /*
@@ -73,6 +83,7 @@ public class HashFunctionsTest extends ScalarTestCase {
     @Test
     public void testConcatenation() throws Exception {
         assertEvaluate("'crate ' || sha1('')", "crate da39a3ee5e6b4b0d3255bfef95601890afd80709");
+        assertEvaluate("'crate ' || blake3('')", "crate af1349b9f5f9a1a6a0404dea36dcc9499bcb25c9adc112b7cc9a93cae41f3262");
     }
 
 }

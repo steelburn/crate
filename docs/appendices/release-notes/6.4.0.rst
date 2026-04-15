@@ -78,7 +78,9 @@ None
 Scalar and Aggregation Functions
 --------------------------------
 
-None
+- `Robert Palmer <https://github.com/robd003>`_ added the
+  :ref:`blake3 <scalar-blake3>` scalar function for computing BLAKE3 checksums of
+  strings.
 
 Performance and Resilience Improvements
 ---------------------------------------

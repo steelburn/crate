@@ -386,6 +386,27 @@ Returns: ``text``
      SELECT 1 row in set (... sec)
 
 
+.. _scalar-blake3:
+
+``blake3('string')``
+--------------------
+
+Returns: ``text``
+
+Computes the BLAKE3 checksum of the given string using the default 256-bit
+digest.
+
+::
+
+    cr> select blake3('foo') AS blake3;
+    +------------------------------------------------------------------+
+    | blake3                                                           |
+    +------------------------------------------------------------------+
+    | 04e0bb39f30b1a3feb89f536c93be15055482df748674b00d26e5a75777702e9 |
+    +------------------------------------------------------------------+
+    SELECT 1 row in set (... sec)
+
+
 .. _scalar-sha1:
 
 ``sha1('string')``
