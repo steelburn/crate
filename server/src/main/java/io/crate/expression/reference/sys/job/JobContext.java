@@ -42,7 +42,9 @@ public class JobContext implements Accountable {
     private final long started;
     @Nullable
     private final Classification classification;
-    private final StmtEvent event;
+
+    @Nullable
+    private StmtEvent event;
 
     public JobContext(UUID id, int sessionId, String stmt, long started, Role user, @Nullable Classification classification) {
         this.id = id;
@@ -51,8 +53,9 @@ public class JobContext implements Accountable {
         this.started = started;
         this.username = user.name();
         this.classification = classification;
-        this.event = new StmtEvent();
+        StmtEvent event = new StmtEvent();
         if (event.shouldCommit()) {
+            this.event = event;
             event.id = id.toString();
             event.stmt = stmt;
             event.classification = classification == null ? null : classification.type().toString();
@@ -61,9 +64,10 @@ public class JobContext implements Accountable {
     }
 
     public void finish(long affectedRowCount) {
-        if (event.shouldCommit()) {
+        if (event != null && event.shouldCommit()) {
             event.affectedRowCount = affectedRowCount;
             event.commit();
+            event = null;
         }
     }
 
